@@ -10,5 +10,5 @@ export default NextAuth({
     }),
     // ...add more providers here
   ],
-  debug: process.env.NEXT_AUTH_DEBUG,
+  debug: process.env.NEXTAUTH_DEBUG,
 });
