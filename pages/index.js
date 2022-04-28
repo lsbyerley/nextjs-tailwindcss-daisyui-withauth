@@ -1,10 +1,16 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useSession, signIn, signOut, getProviders } from 'next-auth/react';
 
 export default function Home({ providers }) {
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
+  const sessionLoading = sessionStatus === 'loading';
 
   console.log('LOG: session client', session);
+
+  // When rendering client side don't display anything until loading is complete
+  // https://github.com/nextauthjs/next-auth-example/blob/main/pages/protected.tsx
+  if (typeof window !== 'undefined' && sessionLoading) return null;
 
   return (
     <div className='bg-base-100'>
@@ -30,14 +36,17 @@ export default function Home({ providers }) {
                 </>
               )}
               {!session && (
-                <button className='mb-4 btn' onClick={() => signIn()}>
-                  Sign In
-                </button>
+                <Link href='/auth/signin'>
+                  <a className='mb-4 btn'>Sign In</a>
+                </Link>
               )}
               {!session &&
                 Object.values(providers).map((provider) => (
                   <div key={provider.name}>
-                    <button className='btn' onClick={() => signIn(provider.id)}>
+                    <button
+                      className='mb-4 btn'
+                      onClick={() => signIn(provider.id, { callbackUrl: '/' })}
+                    >
                       Sign in with {provider.name}
                     </button>
                   </div>
